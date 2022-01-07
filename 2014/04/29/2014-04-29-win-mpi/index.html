@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.0.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.4" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Qt,MSVC,MPI,并行计算," />
+
+
+<meta name="description" content="（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）   MPI是信息传递接口的简称，常用来进行进程间、机器间的通信与并行计算。一般而言，MPI都会部署在*nix系统下，在Windows下面直接编译、配置MPI并不容易。本文利用MS提供的编译好的MPI的版本，介绍如何在Windows原生环境下（不包括MinGW、CygWin），使用VC或QT编译MPI程序。">
+<meta name="keywords" content="Qt,MSVC,MPI,并行计算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows下用VC与QT编译MPI程序入门">
+<meta property="og:url" content="http://www.chenguanzhou.com/2014/04/29/2014-04-29-win-mpi/index.html">
+<meta property="og:site_name" content="陈关州的博客">
+<meta property="og:description" content="（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）   MPI是信息传递接口的简称，常用来进行进程间、机器间的通信与并行计算。一般而言，MPI都会部署在*nix系统下，在Windows下面直接编译、配置MPI并不容易。本文利用MS提供的编译好的MPI的版本，介绍如何在Windows原生环境下（不包括MinGW、CygWin），使用VC或QT编译MPI程序。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.chenguanzhou.com/images/VS_MPI.png">
+<meta property="og:image" content="http://www.chenguanzhou.com/images/VS_MPI_DEBUG.png">
+<meta property="og:image" content="http://www.chenguanzhou.com/images/VS_MPI_LINK.png">
+<meta property="og:image" content="http://www.chenguanzhou.com/images/VS_MPI_RESULT.png">
+<meta property="og:image" content="http://www.chenguanzhou.com/images/QT_MPI.png">
+<meta property="og:updated_time" content="2022-01-07T03:19:22.120Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Windows下用VC与QT编译MPI程序入门">
+<meta name="twitter:description" content="（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）   MPI是信息传递接口的简称，常用来进行进程间、机器间的通信与并行计算。一般而言，MPI都会部署在*nix系统下，在Windows下面直接编译、配置MPI并不容易。本文利用MS提供的编译好的MPI的版本，介绍如何在Windows原生环境下（不包括MinGW、CygWin），使用VC或QT编译MPI程序。">
+<meta name="twitter:image" content="http://www.chenguanzhou.com/images/VS_MPI.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="陈关州的博客" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://www.chenguanzhou.com/2014/04/29/2014-04-29-win-mpi/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>Windows下用VC与QT编译MPI程序入门 | 陈关州的博客</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">陈关州的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">More Professional</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cdtstudio">
+          <a href="/cdtstudio/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-code"></i> <br />CDTStudio项目</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签<span class="badge">19</span>
+              </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类<span class="badge">2</span>
+              </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档<span class="badge">8</span>
+              </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+  
+  
+  
+    
+      
+    
+    <a href="https://github.com/chenguanzhou" class="github-corner" target="_blank" title="关注我的Github" aria-label="关注我的Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg>
+    
+      </a>
+    
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.chenguanzhou.com/2014/04/29/2014-04-29-win-mpi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="陈关州">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/cgz.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="陈关州的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Windows下用VC与QT编译MPI程序入门</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2014-04-29T16:52:53+08:00">2014-04-29</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/开发/" itemprop="url" rel="index"><span itemprop="name">开发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <center><strong>（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）</strong></center>
+
+
+<p><a href="http://zh.wikipedia.org/wiki/%E8%A8%8A%E6%81%AF%E5%82%B3%E9%81%9E%E4%BB%8B%E9%9D%A2" target="_blank" rel="noopener">MPI</a>是<code>信息传递接口</code>的简称，常用来进行进程间、机器间的通信与并行计算。一般而言，MPI都会部署在*nix系统下，在Windows下面直接编译、配置MPI并不容易。本文利用MS提供的编译好的MPI的版本，介绍如何在Windows原生环境下（不包括MinGW、CygWin），使用VC或QT编译MPI程序。</p>
+<a id="more"></a>
+<h1 id="下载、安装MPI"><a href="#下载、安装MPI" class="headerlink" title="下载、安装MPI"></a>下载、安装MPI</h1><p>MS官网提供编译好的MPI安装程序，可以直接下载<a href="http://go.microsoft.com/fwlink/?LinkId=389563" target="_blank" rel="noopener">【传送门】</a>。下载好后，直接安装既可。</p>
+<h1 id="使用VS编写MPI程序"><a href="#使用VS编写MPI程序" class="headerlink" title="使用VS编写MPI程序"></a>使用VS编写MPI程序</h1><h2 id="1-新建工程"><a href="#1-新建工程" class="headerlink" title="1. 新建工程"></a>1. 新建工程</h2><p>新建VC控制台工程。</p>
+<h2 id="2-配置路径"><a href="#2-配置路径" class="headerlink" title="2. 配置路径"></a>2. 配置路径</h2><p>“项目右键→属性→配置属性→VC++目录”中，分别将MPI安装路径里的Inc与Lib路径添加到<code>包含目录</code>和<code>库目录</code>中。PS：上述Lib路径，32位环境下面是指Lib下面的i386文件夹，64位库则是指amd64文件夹。<br><img src="/images/VS_MPI.png" alt="Demo"></p>
+<h2 id="3-配置lib文件"><a href="#3-配置lib文件" class="headerlink" title="3. 配置lib文件"></a>3. 配置lib文件</h2><p>“项目右键→属性→配置属性→链接器→输入→附加依赖项”，添加MPI的lib文件，即msmpi.lib<br><img src="/images/VS_MPI_DEBUG.png" alt="Demo"></p>
+<h2 id="4-code"><a href="#4-code" class="headerlink" title="4. code"></a>4. code</h2><p>在cpp文件中，写入如下代码（找不到<code>stdafx.h</code>的，可以删掉第一句）：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"stdafx.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;mpi.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BUFSIZE 128</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> TAG 0</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> idstr[<span class="number">32</span>];</span><br><span class="line">    <span class="keyword">char</span> buff[BUFSIZE];</span><br><span class="line">    <span class="keyword">int</span> numprocs;</span><br><span class="line">    <span class="keyword">int</span> myid;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    MPI_Status stat;</span><br><span class="line">    <span class="comment">/* MPI programs start with MPI_Init; all 'N' processes exist thereafter */</span></span><br><span class="line">    MPI_Init(&amp;argc,&amp;argv);</span><br><span class="line">    <span class="comment">/* find out how big the SPMD world is */</span></span><br><span class="line">    MPI_Comm_size(MPI_COMM_WORLD,&amp;numprocs);</span><br><span class="line">    <span class="comment">/* and this processes' rank is */</span></span><br><span class="line">    MPI_Comm_rank(MPI_COMM_WORLD,&amp;myid);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* At this point, all programs are running equivalently, the rank</span></span><br><span class="line"><span class="comment">      distinguishes the roles of the programs in the SPMD model, with</span></span><br><span class="line"><span class="comment">      rank 0 often used specially... */</span></span><br><span class="line">    <span class="keyword">if</span>(myid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%d: We have %d processors\n"</span>, myid, numprocs);</span><br><span class="line">        <span class="keyword">for</span>(i=<span class="number">1</span>;i&lt;numprocs;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            sprintf_s(buff, <span class="string">"Hello %d! "</span>, i);</span><br><span class="line">            MPI_Send(buff, BUFSIZE, MPI_CHAR, i, TAG, MPI_COMM_WORLD);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(i=<span class="number">1</span>;i&lt;numprocs;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            MPI_Recv(buff, BUFSIZE, MPI_CHAR, i, TAG, MPI_COMM_WORLD, &amp;stat);</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"%d: %s\n"</span>, myid, buff);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* receive from rank 0: */</span></span><br><span class="line">        MPI_Recv(buff, BUFSIZE, MPI_CHAR, <span class="number">0</span>, TAG, MPI_COMM_WORLD, &amp;stat);</span><br><span class="line">        sprintf_s(idstr, <span class="string">"Processor %d "</span>, myid);</span><br><span class="line">        strncat_s(buff, idstr, BUFSIZE<span class="number">-1</span>);</span><br><span class="line">        strncat_s(buff, <span class="string">"reporting for duty\n"</span>, BUFSIZE<span class="number">-1</span>);</span><br><span class="line">        <span class="comment">/* send to rank 0: */</span></span><br><span class="line">        MPI_Send(buff, BUFSIZE, MPI_CHAR, <span class="number">0</span>, TAG, MPI_COMM_WORLD);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* MPI programs end with MPI Finalize; this is a weak synchronization point */</span></span><br><span class="line">    MPI_Finalize();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>PS：这段代码中，由于VS高版本安全性能的提升，不能使用<code>sprintf</code>、<code>strncat</code>函数，因此，代码中全部被改为了<code>sprintf_s</code>与<code>strncat_s</code>。低版本的VS抱错的话，请自动改回来。</p>
+<h2 id="5-修改调试方式"><a href="#5-修改调试方式" class="headerlink" title="5. 修改调试方式"></a>5. 修改调试方式</h2><p>由于MPI程序要能并行计算，必须由<code>mpiexec.exe</code>启动，不能直接运行程序的exe，因此需要修改程序的运行方式。“项目右键→属性→配置属性→调试”，将<code>命令</code>改为<code>mpiexec</code>，<code>工作参数</code>改为<code>$(TargetPath)</code>。<br><img src="/images/VS_MPI_LINK.png" alt="Demo"></p>
+<h2 id="6-生成"><a href="#6-生成" class="headerlink" title="6. 生成"></a>6. 生成</h2><p>不报错即可。生成后结果如下：<br><img src="/images/VS_MPI_RESULT.png" alt="Demo"></p>
+<h1 id="使用Qt编写MPI程序"><a href="#使用Qt编写MPI程序" class="headerlink" title="使用Qt编写MPI程序"></a>使用Qt编写MPI程序</h1><p>其实严格来说，这讲的是用QtCreator来构建，实际上编译器还是VC的。</p>
+<h2 id="1-新建工程-1"><a href="#1-新建工程-1" class="headerlink" title="1. 新建工程"></a>1. 新建工程</h2><p>新建项目→非Qt项目→纯c++语言项目</p>
+<h2 id="2-配置环境变量"><a href="#2-配置环境变量" class="headerlink" title="2. 配置环境变量"></a>2. 配置环境变量</h2><p>可以直接在系统环境变量中配置，也可以在Qt中的“项目→构建与运行→构建变量”中进行。具体设置如下：</p>
+<ul>
+<li>添加MPI安装路径里的Inc路径到环境变量<code>include</code>中（不存在则新建这个环境变量，下同）；</li>
+<li>添加MPI的lib文件所在路径到环境变量<code>lib</code>中。（与前文一样，注意32位与64位的区别）<h2 id="3-修改pro文件"><a href="#3-修改pro文件" class="headerlink" title="3. 修改pro文件"></a>3. 修改pro文件</h2>在项目pro文件，在里面添加下面2行代码，并重新qmake：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LIBS += -lmsmpi</span><br><span class="line">DESTDIR = ./</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>第一句代表链接到msmpi.lib文件。第二句是为了后面更好的运行程序，更改了我们程序生成的路径。</p>
+<h2 id="4-code-1"><a href="#4-code-1" class="headerlink" title="4. code"></a>4. code</h2><p>代码跟前文VS里的一样，只需把第一行去掉</p>
+<h2 id="5-修改调试方式-1"><a href="#5-修改调试方式-1" class="headerlink" title="5. 修改调试方式"></a>5. 修改调试方式</h2><p>“项目→构建与运行→运行”设置如下图：<br><img src="/images/QT_MPI.png" alt="Demo"><br>其中，执行的是mpiexec.exe，“MPITest.exe”为程序生成的exe。这一步的目的跟VS中的一样。</p>
+<h2 id="6-构建并运行"><a href="#6-构建并运行" class="headerlink" title="6. 构建并运行"></a>6. 构建并运行</h2><p>运行结果应该跟VS的一样</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>MPI程序在Win下面跟普通的第三方库并没有太大区别，只是在运行的时候，需要由<br>mpiexec.exe来启动程序。由本文可以看出，文中提供Win下两种IDE编译MPI程序的方法，大同小异。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><a href="http://zh.wikipedia.org/wiki/%E8%A8%8A%E6%81%AF%E5%82%B3%E9%81%9E%E4%BB%8B%E9%9D%A2" target="_blank" rel="noopener">MPI维基百科</a></li>
+<li><a href="http://www.mpich.org/" target="_blank" rel="noopener">MPICH官网</a></li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Qt/" rel="tag"># Qt</a>
+          
+            <a href="/tags/MSVC/" rel="tag"># MSVC</a>
+          
+            <a href="/tags/MPI/" rel="tag"># MPI</a>
+          
+            <a href="/tags/并行计算/" rel="tag"># 并行计算</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/01/17/2014-01-17-qtkuai-su-du-qu-xian-shi-sqlite3shu-ju-ku-shu-ju/" rel="next" title="QT快速读取显示SQLite3数据库数据">
+                <i class="fa fa-chevron-left"></i> QT快速读取显示SQLite3数据库数据
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/09/26/2014-09-26-QTC-Introduction/" rel="prev" title="Qt云服务/云计算平台QTC（Qt Cloud Services）入门（0）—— Introduction">
+                Qt云服务/云计算平台QTC（Qt Cloud Services）入门（0）—— Introduction <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/cgz.jpg"
+                alt="陈关州" />
+            
+              <p class="site-author-name" itemprop="name">陈关州</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chenguanzhou" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:chenguanzhou123@163.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/chen-guan-zhou-55/activities" target="_blank" title="知乎"><i class="fa fa-fw fa-question"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://xueshu.baidu.com/scholarID/CN-BD9JZ5QJ" target="_blank" title="百度学术"><i class="fa fa-fw fa-graduation-cap"></i></a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.whu-cveo.com/" title="武汉大学CVEO小组" target="_blank">武汉大学CVEO小组</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.freertech.cn" title="湖北富瑞尔科技有限公司" target="_blank">湖北富瑞尔科技有限公司</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#下载、安装MPI"><span class="nav-number">1.</span> <span class="nav-text">下载、安装MPI</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用VS编写MPI程序"><span class="nav-number">2.</span> <span class="nav-text">使用VS编写MPI程序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-新建工程"><span class="nav-number">2.1.</span> <span class="nav-text">1. 新建工程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-配置路径"><span class="nav-number">2.2.</span> <span class="nav-text">2. 配置路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-配置lib文件"><span class="nav-number">2.3.</span> <span class="nav-text">3. 配置lib文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-code"><span class="nav-number">2.4.</span> <span class="nav-text">4. code</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-修改调试方式"><span class="nav-number">2.5.</span> <span class="nav-text">5. 修改调试方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-生成"><span class="nav-number">2.6.</span> <span class="nav-text">6. 生成</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用Qt编写MPI程序"><span class="nav-number">3.</span> <span class="nav-text">使用Qt编写MPI程序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-新建工程-1"><span class="nav-number">3.1.</span> <span class="nav-text">1. 新建工程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-配置环境变量"><span class="nav-number">3.2.</span> <span class="nav-text">2. 配置环境变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-修改pro文件"><span class="nav-number">3.3.</span> <span class="nav-text">3. 修改pro文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-code-1"><span class="nav-number">3.4.</span> <span class="nav-text">4. code</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-修改调试方式-1"><span class="nav-number">3.5.</span> <span class="nav-text">5. 修改调试方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-构建并运行"><span class="nav-number">3.6.</span> <span class="nav-text">6. 构建并运行</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">陈关州</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.0.4</div>
+<p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('-1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
