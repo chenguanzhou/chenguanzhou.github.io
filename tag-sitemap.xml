@@ -51,6 +51,13 @@
     </url>
 
     <url>
+        <loc>http://www.chenguanzhou.com/tags/Git/</loc>
+        <lastmod>2022-01-07T03:19:22.120Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>http://www.chenguanzhou.com/tags/SQLite/</loc>
         <lastmod>2022-01-07T03:19:22.120Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -66,13 +73,6 @@
 
     <url>
         <loc>http://www.chenguanzhou.com/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
-        <lastmod>2022-01-07T03:19:22.120Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>http://www.chenguanzhou.com/tags/Git/</loc>
         <lastmod>2022-01-07T03:19:22.120Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
