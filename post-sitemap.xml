@@ -23,6 +23,14 @@
     </url>
 
     <url>
+        <loc>http://www.chenguanzhou.com/2014/04/29/2014-04-29-win-mpi/</loc>
+        <lastmod>2022-01-07T03:19:22.120Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://www.chenguanzhou.com/2014/01/17/2014-01-17-qtkuai-su-du-qu-xian-shi-sqlite3shu-ju-ku-shu-ju/</loc>
         <lastmod>2022-01-07T03:19:22.120Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -31,7 +39,7 @@
     </url>
 
     <url>
-        <loc>http://www.chenguanzhou.com/2014/04/29/2014-04-29-win-mpi/</loc>
+        <loc>http://www.chenguanzhou.com/2015/05/09/qgis-1-preparation/</loc>
         <lastmod>2022-01-07T03:19:22.120Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -48,14 +56,6 @@
 
     <url>
         <loc>http://www.chenguanzhou.com/2015/05/10/qgis-2-first/</loc>
-        <lastmod>2022-01-07T03:19:22.120Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>http://www.chenguanzhou.com/2015/05/09/qgis-1-preparation/</loc>
         <lastmod>2022-01-07T03:19:22.120Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>

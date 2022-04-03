@@ -7,6 +7,13 @@
     </url>
     
     <url>
+        <loc>http://www.chenguanzhou.com/about/</loc>
+        <lastmod>2022-04-03T03:42:09.949Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
         <loc>http://www.chenguanzhou.com/tags/</loc>
         <lastmod>2022-01-07T03:19:22.151Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -15,13 +22,6 @@
     
     <url>
         <loc>http://www.chenguanzhou.com/cdtstudio/</loc>
-        <lastmod>2022-01-07T03:19:22.136Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    <url>
-        <loc>http://www.chenguanzhou.com/categories/</loc>
         <lastmod>2022-01-07T03:19:22.136Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -42,7 +42,7 @@
     </url>
     
     <url>
-        <loc>http://www.chenguanzhou.com/about/</loc>
+        <loc>http://www.chenguanzhou.com/categories/</loc>
         <lastmod>2022-01-07T03:19:22.136Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
