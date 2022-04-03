@@ -30,27 +30,6 @@
     </url>
 
     <url>
-        <loc>http://www.chenguanzhou.com/tags/MSVC/</loc>
-        <lastmod>2022-01-07T03:19:22.120Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>http://www.chenguanzhou.com/tags/MPI/</loc>
-        <lastmod>2022-01-07T03:19:22.120Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>http://www.chenguanzhou.com/tags/%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97/</loc>
-        <lastmod>2022-01-07T03:19:22.120Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://www.chenguanzhou.com/tags/SQLite/</loc>
         <lastmod>2022-01-07T03:19:22.120Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -66,6 +45,27 @@
 
     <url>
         <loc>http://www.chenguanzhou.com/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
+        <lastmod>2022-01-07T03:19:22.120Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.chenguanzhou.com/tags/MSVC/</loc>
+        <lastmod>2022-01-07T03:19:22.120Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.chenguanzhou.com/tags/MPI/</loc>
+        <lastmod>2022-01-07T03:19:22.120Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.chenguanzhou.com/tags/%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97/</loc>
         <lastmod>2022-01-07T03:19:22.120Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -114,14 +114,14 @@
     </url>
 
     <url>
-        <loc>http://www.chenguanzhou.com/tags/3S/</loc>
+        <loc>http://www.chenguanzhou.com/tags/PyQGIS/</loc>
         <lastmod>2022-01-07T03:19:22.136Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>http://www.chenguanzhou.com/tags/PyQGIS/</loc>
+        <loc>http://www.chenguanzhou.com/tags/3S/</loc>
         <lastmod>2022-01-07T03:19:22.136Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
