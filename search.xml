@@ -206,15 +206,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Windows平台下各种Markdown编辑器功能对比</title>
-    <url>/2016/02/16/markdowneditor/</url>
-    <content><![CDATA[<p>不多说，上图：</p>
-<a id="more"></a>
-<p><img src="/images/markdown.png" alt="对比" title="Win平台下Markdown编辑器功能对比"></p>
-<p><a href="/images/markdown.png">大图</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>QGIS开发教程(1)——QGIS开发准备工作</title>
     <url>/2015/05/09/qgis-1-preparation/</url>
     <content><![CDATA[<center><strong>（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）</strong></center>
@@ -348,42 +339,6 @@ path     C:\OSGeo4W64\bin;C:\OSGeo4W64\apps\qgis\bin
       </tags>
   </entry>
   <entry>
-    <title>QGIS开发教程(3)——如何学习QGIS开发(通过PyQGIS文档)</title>
-    <url>/2015/05/17/qgis-3-how-to-learn/</url>
-    <content><![CDATA[<center><strong>（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）</strong></center>
-
-<h1 id="自主学习QGIS开发"><a href="#自主学习QGIS开发" class="headerlink" title="自主学习QGIS开发"></a>自主学习QGIS开发</h1><p>虽然<code>QGIS</code>本身功能强大，但还是架不住我们要编写新的功能、新的业务流程、新的算法。前文中我们提到，扩展<code>QGIS</code>有2种方法，一是用<code>Python</code>、<code>C++</code>来写QGIS的插件；另一种就是基于<code>QGIS</code>的<code>C++ API</code>开发独立应用程序。然而后者资料甚少，官方<code>C++ API</code>文档也非常简略，我也不可能把所有功能都列举出来，放到博客里。因此我们想要开发更多功能，就得借助一大利器——<code>PyQGIS</code>的文档了。</p>
-<a id="more"></a>
-<h1 id="PyQGIS"><a href="#PyQGIS" class="headerlink" title="PyQGIS"></a>PyQGIS</h1><blockquote>
-<p>Python是一种面向对象、直译式的电脑程式语言，具有近二十年的发展历史。它包含了一组功能完备的标准库，能够轻松完成很多常见的任务。它的语法简单，与其它大多数程式设计语言使用大括号不一样，它使用缩进来定义语句块。</p>
-</blockquote>
-<p><code>Python</code>由于有着较高的开发效率，并且具有胶水语言的特性，被广泛应用于各种系统当中。<code>ArcGIS</code>与<code>QGIS</code>也不例外。<code>QGIS</code>项目中，使用了<a href="https://wiki.python.org/moin/SIP" target="_blank" rel="noopener"><code>sip</code></a>库来实现<code>Python</code>与<code>C++</code>代码的绑定。<code>QGIS</code>官方称之为<code>PyQGIS</code>。</p>
-<p><code>QGIS</code>软件里面，专门有一个<code>Python</code>的控制台，用于使用<code>Python</code>脚本，实现一些特殊功能。开启方法为：<code>Plugins → Python Console</code>。效果图如下：</p>
-<p><img src="/images/QGIS/console.png" alt="Python Console" title="Python控制台"></p>
-<p>由于<code>Python</code>的种种优势，<code>QGIS</code>官方写了一个<a href="http://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/index.html" target="_blank" rel="noopener">PyQGIS cookbook</a>的文档，里面对<code>PyQGIS</code>进行了详细的介绍。文档内容包括但不限于：<br>-载入图层<br>-使用栅格图层<br>-使用矢量图层<br>-处理几何形体<br>-投影变换<br>-地图渲染、打印</p>
-<p>研究<code>PyQGIS</code>文档，就会发现，里面各个类的名称，与<code>QGIS</code>的<code>C++ API</code>中的名称一样。因此，我们可以通过<code>QGIS</code>的<code>Python</code>文档，来学习QGIS C++的开发。</p>
-<h1 id="举例——载入图层"><a href="#举例——载入图层" class="headerlink" title="举例——载入图层"></a>举例——载入图层</h1><p>上一篇中提到的，我们的第一个<code>QGIS</code>程序中的一个功能，就是打开<code>Shapefile</code>文件，并显示出来。如果我们通过<code>PyQGIS</code>的文档，该怎样学习开发呢？</p>
-<p>我们应该先在<code>PyQGIS</code>中，找到相应功能的文档介绍。比如载入图层，就是：<a href="http://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/loadlayer.html" target="_blank" rel="noopener">http://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/loadlayer.html</a></p>
-<p>里面介绍载入<code>OGR</code>图层（<code>Shapefile</code>属于<code>OGR</code>图层），代码如下：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">vlayer = QgsVectorLayer(<span class="string">"/path/to/shapefile/file.shp"</span>, <span class="string">"layer_name_you_like"</span>, <span class="string">"ogr"</span>)</span><br></pre></td></tr></table></figure></p>
-<p>我们”翻译“成<code>C++</code>的代码，就是：<br><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QgsVectorLayer *vlayer = <span class="keyword">new</span> QgsVectorLayer(<span class="string">"/path/to/shapefile/file.shp"</span>, <span class="string">"layer_name_you_like"</span>, <span class="string">"ogr"</span>);</span><br></pre></td></tr></table></figure></p>
-<p>可以看出来，<code>Python</code>代码转化为<code>C++</code>代码非常方便。</p>
-<p>文档中还介绍了载入栅格图层的<code>Python</code>代码：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">fileName = <span class="string">"/path/to/raster/file.tif"</span></span><br><span class="line">fileInfo = QFileInfo(fileName)</span><br><span class="line">baseName = fileInfo.baseName()</span><br><span class="line">rlayer = QgsRasterLayer(fileName, baseName)</span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> rlayer.isValid():</span><br><span class="line">  <span class="keyword">print</span> <span class="string">"Layer failed to load!"</span></span><br></pre></td></tr></table></figure></p>
-<p>其对应的<code>C++</code>代码就可以写成：<br><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QString fileName = <span class="string">"/path/to/raster/file.tif"</span>;</span><br><span class="line">QString fileInfo = QFileInfo(fileName);</span><br><span class="line">QString baseName = fileInfo.baseName();</span><br><span class="line">QgsRasterLayer *rlayer = <span class="keyword">new</span> QgsRasterLayer(fileName, baseName);</span><br><span class="line"><span class="keyword">if</span> (!rlayer.isValid())</span><br><span class="line">  qDebug()&lt;&lt;<span class="string">"Layer failed to load!"</span>;</span><br></pre></td></tr></table></figure></p>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>通过<code>PyQGIS</code>文档，我们可以了解<code>QGIS</code>的基本开发方法，也能很容易地将<code>Python</code>代码转化为<code>C++</code>代码。</p>
-]]></content>
-      <categories>
-        <category>QGIS开发教程</category>
-      </categories>
-      <tags>
-        <tag>Qt</tag>
-        <tag>QGIS</tag>
-        <tag>C++</tag>
-        <tag>Shapefile</tag>
-        <tag>Python</tag>
-        <tag>PyQGIS</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>QGIS开发教程(0)——GIS平台现状</title>
     <url>/2015/05/08/qgis-introduction/</url>
     <content><![CDATA[<center><strong>（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）</strong></center>
@@ -445,6 +400,51 @@ path     C:\OSGeo4W64\bin;C:\OSGeo4W64\apps\qgis\bin
         <tag>C++</tag>
         <tag>Python</tag>
         <tag>3S</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Windows平台下各种Markdown编辑器功能对比</title>
+    <url>/2016/02/16/markdowneditor/</url>
+    <content><![CDATA[<p>不多说，上图：</p>
+<a id="more"></a>
+<p><img src="/images/markdown.png" alt="对比" title="Win平台下Markdown编辑器功能对比"></p>
+<p><a href="/images/markdown.png">大图</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>QGIS开发教程(3)——如何学习QGIS开发(通过PyQGIS文档)</title>
+    <url>/2015/05/17/qgis-3-how-to-learn/</url>
+    <content><![CDATA[<center><strong>（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）</strong></center>
+
+<h1 id="自主学习QGIS开发"><a href="#自主学习QGIS开发" class="headerlink" title="自主学习QGIS开发"></a>自主学习QGIS开发</h1><p>虽然<code>QGIS</code>本身功能强大，但还是架不住我们要编写新的功能、新的业务流程、新的算法。前文中我们提到，扩展<code>QGIS</code>有2种方法，一是用<code>Python</code>、<code>C++</code>来写QGIS的插件；另一种就是基于<code>QGIS</code>的<code>C++ API</code>开发独立应用程序。然而后者资料甚少，官方<code>C++ API</code>文档也非常简略，我也不可能把所有功能都列举出来，放到博客里。因此我们想要开发更多功能，就得借助一大利器——<code>PyQGIS</code>的文档了。</p>
+<a id="more"></a>
+<h1 id="PyQGIS"><a href="#PyQGIS" class="headerlink" title="PyQGIS"></a>PyQGIS</h1><blockquote>
+<p>Python是一种面向对象、直译式的电脑程式语言，具有近二十年的发展历史。它包含了一组功能完备的标准库，能够轻松完成很多常见的任务。它的语法简单，与其它大多数程式设计语言使用大括号不一样，它使用缩进来定义语句块。</p>
+</blockquote>
+<p><code>Python</code>由于有着较高的开发效率，并且具有胶水语言的特性，被广泛应用于各种系统当中。<code>ArcGIS</code>与<code>QGIS</code>也不例外。<code>QGIS</code>项目中，使用了<a href="https://wiki.python.org/moin/SIP" target="_blank" rel="noopener"><code>sip</code></a>库来实现<code>Python</code>与<code>C++</code>代码的绑定。<code>QGIS</code>官方称之为<code>PyQGIS</code>。</p>
+<p><code>QGIS</code>软件里面，专门有一个<code>Python</code>的控制台，用于使用<code>Python</code>脚本，实现一些特殊功能。开启方法为：<code>Plugins → Python Console</code>。效果图如下：</p>
+<p><img src="/images/QGIS/console.png" alt="Python Console" title="Python控制台"></p>
+<p>由于<code>Python</code>的种种优势，<code>QGIS</code>官方写了一个<a href="http://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/index.html" target="_blank" rel="noopener">PyQGIS cookbook</a>的文档，里面对<code>PyQGIS</code>进行了详细的介绍。文档内容包括但不限于：<br>-载入图层<br>-使用栅格图层<br>-使用矢量图层<br>-处理几何形体<br>-投影变换<br>-地图渲染、打印</p>
+<p>研究<code>PyQGIS</code>文档，就会发现，里面各个类的名称，与<code>QGIS</code>的<code>C++ API</code>中的名称一样。因此，我们可以通过<code>QGIS</code>的<code>Python</code>文档，来学习QGIS C++的开发。</p>
+<h1 id="举例——载入图层"><a href="#举例——载入图层" class="headerlink" title="举例——载入图层"></a>举例——载入图层</h1><p>上一篇中提到的，我们的第一个<code>QGIS</code>程序中的一个功能，就是打开<code>Shapefile</code>文件，并显示出来。如果我们通过<code>PyQGIS</code>的文档，该怎样学习开发呢？</p>
+<p>我们应该先在<code>PyQGIS</code>中，找到相应功能的文档介绍。比如载入图层，就是：<a href="http://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/loadlayer.html" target="_blank" rel="noopener">http://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/loadlayer.html</a></p>
+<p>里面介绍载入<code>OGR</code>图层（<code>Shapefile</code>属于<code>OGR</code>图层），代码如下：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">vlayer = QgsVectorLayer(<span class="string">"/path/to/shapefile/file.shp"</span>, <span class="string">"layer_name_you_like"</span>, <span class="string">"ogr"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>我们”翻译“成<code>C++</code>的代码，就是：<br><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QgsVectorLayer *vlayer = <span class="keyword">new</span> QgsVectorLayer(<span class="string">"/path/to/shapefile/file.shp"</span>, <span class="string">"layer_name_you_like"</span>, <span class="string">"ogr"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>可以看出来，<code>Python</code>代码转化为<code>C++</code>代码非常方便。</p>
+<p>文档中还介绍了载入栅格图层的<code>Python</code>代码：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">fileName = <span class="string">"/path/to/raster/file.tif"</span></span><br><span class="line">fileInfo = QFileInfo(fileName)</span><br><span class="line">baseName = fileInfo.baseName()</span><br><span class="line">rlayer = QgsRasterLayer(fileName, baseName)</span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> rlayer.isValid():</span><br><span class="line">  <span class="keyword">print</span> <span class="string">"Layer failed to load!"</span></span><br></pre></td></tr></table></figure></p>
+<p>其对应的<code>C++</code>代码就可以写成：<br><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QString fileName = <span class="string">"/path/to/raster/file.tif"</span>;</span><br><span class="line">QString fileInfo = QFileInfo(fileName);</span><br><span class="line">QString baseName = fileInfo.baseName();</span><br><span class="line">QgsRasterLayer *rlayer = <span class="keyword">new</span> QgsRasterLayer(fileName, baseName);</span><br><span class="line"><span class="keyword">if</span> (!rlayer.isValid())</span><br><span class="line">  qDebug()&lt;&lt;<span class="string">"Layer failed to load!"</span>;</span><br></pre></td></tr></table></figure></p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>通过<code>PyQGIS</code>文档，我们可以了解<code>QGIS</code>的基本开发方法，也能很容易地将<code>Python</code>代码转化为<code>C++</code>代码。</p>
+]]></content>
+      <categories>
+        <category>QGIS开发教程</category>
+      </categories>
+      <tags>
+        <tag>Qt</tag>
+        <tag>QGIS</tag>
+        <tag>C++</tag>
+        <tag>Shapefile</tag>
+        <tag>Python</tag>
+        <tag>PyQGIS</tag>
       </tags>
   </entry>
 </search>
