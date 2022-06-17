@@ -1,6 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Windows平台下各种Markdown编辑器功能对比</title>
+    <url>/2016/02/16/markdowneditor/</url>
+    <content><![CDATA[<p>不多说，上图：</p>
+<a id="more"></a>
+<p><img src="/images/markdown.png" alt="对比" title="Win平台下Markdown编辑器功能对比"></p>
+<p><a href="/images/markdown.png">大图</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Windows下用VC与QT编译MPI程序入门</title>
+    <url>/2014/04/29/2014-04-29-win-mpi/</url>
+    <content><![CDATA[<center><strong>（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）</strong></center>
+
+
+<p><a href="http://zh.wikipedia.org/wiki/%E8%A8%8A%E6%81%AF%E5%82%B3%E9%81%9E%E4%BB%8B%E9%9D%A2" target="_blank" rel="noopener">MPI</a>是<code>信息传递接口</code>的简称，常用来进行进程间、机器间的通信与并行计算。一般而言，MPI都会部署在*nix系统下，在Windows下面直接编译、配置MPI并不容易。本文利用MS提供的编译好的MPI的版本，介绍如何在Windows原生环境下（不包括MinGW、CygWin），使用VC或QT编译MPI程序。</p>
+<a id="more"></a>
+<h1 id="下载、安装MPI"><a href="#下载、安装MPI" class="headerlink" title="下载、安装MPI"></a>下载、安装MPI</h1><p>MS官网提供编译好的MPI安装程序，可以直接下载<a href="http://go.microsoft.com/fwlink/?LinkId=389563" target="_blank" rel="noopener">【传送门】</a>。下载好后，直接安装既可。</p>
+<h1 id="使用VS编写MPI程序"><a href="#使用VS编写MPI程序" class="headerlink" title="使用VS编写MPI程序"></a>使用VS编写MPI程序</h1><h2 id="1-新建工程"><a href="#1-新建工程" class="headerlink" title="1. 新建工程"></a>1. 新建工程</h2><p>新建VC控制台工程。</p>
+<h2 id="2-配置路径"><a href="#2-配置路径" class="headerlink" title="2. 配置路径"></a>2. 配置路径</h2><p>“项目右键→属性→配置属性→VC++目录”中，分别将MPI安装路径里的Inc与Lib路径添加到<code>包含目录</code>和<code>库目录</code>中。PS：上述Lib路径，32位环境下面是指Lib下面的i386文件夹，64位库则是指amd64文件夹。<br><img src="/images/VS_MPI.png" alt="Demo"></p>
+<h2 id="3-配置lib文件"><a href="#3-配置lib文件" class="headerlink" title="3. 配置lib文件"></a>3. 配置lib文件</h2><p>“项目右键→属性→配置属性→链接器→输入→附加依赖项”，添加MPI的lib文件，即msmpi.lib<br><img src="/images/VS_MPI_DEBUG.png" alt="Demo"></p>
+<h2 id="4-code"><a href="#4-code" class="headerlink" title="4. code"></a>4. code</h2><p>在cpp文件中，写入如下代码（找不到<code>stdafx.h</code>的，可以删掉第一句）：<br><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"stdafx.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;mpi.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BUFSIZE 128</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> TAG 0</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> idstr[<span class="number">32</span>];</span><br><span class="line">    <span class="keyword">char</span> buff[BUFSIZE];</span><br><span class="line">    <span class="keyword">int</span> numprocs;</span><br><span class="line">    <span class="keyword">int</span> myid;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    MPI_Status stat;</span><br><span class="line">    <span class="comment">/* MPI programs start with MPI_Init; all 'N' processes exist thereafter */</span></span><br><span class="line">    MPI_Init(&amp;argc,&amp;argv);</span><br><span class="line">    <span class="comment">/* find out how big the SPMD world is */</span></span><br><span class="line">    MPI_Comm_size(MPI_COMM_WORLD,&amp;numprocs);</span><br><span class="line">    <span class="comment">/* and this processes' rank is */</span></span><br><span class="line">    MPI_Comm_rank(MPI_COMM_WORLD,&amp;myid);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* At this point, all programs are running equivalently, the rank</span></span><br><span class="line"><span class="comment">      distinguishes the roles of the programs in the SPMD model, with</span></span><br><span class="line"><span class="comment">      rank 0 often used specially... */</span></span><br><span class="line">    <span class="keyword">if</span>(myid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%d: We have %d processors\n"</span>, myid, numprocs);</span><br><span class="line">        <span class="keyword">for</span>(i=<span class="number">1</span>;i&lt;numprocs;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            sprintf_s(buff, <span class="string">"Hello %d! "</span>, i);</span><br><span class="line">            MPI_Send(buff, BUFSIZE, MPI_CHAR, i, TAG, MPI_COMM_WORLD);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(i=<span class="number">1</span>;i&lt;numprocs;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            MPI_Recv(buff, BUFSIZE, MPI_CHAR, i, TAG, MPI_COMM_WORLD, &amp;stat);</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"%d: %s\n"</span>, myid, buff);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* receive from rank 0: */</span></span><br><span class="line">        MPI_Recv(buff, BUFSIZE, MPI_CHAR, <span class="number">0</span>, TAG, MPI_COMM_WORLD, &amp;stat);</span><br><span class="line">        sprintf_s(idstr, <span class="string">"Processor %d "</span>, myid);</span><br><span class="line">        strncat_s(buff, idstr, BUFSIZE<span class="number">-1</span>);</span><br><span class="line">        strncat_s(buff, <span class="string">"reporting for duty\n"</span>, BUFSIZE<span class="number">-1</span>);</span><br><span class="line">        <span class="comment">/* send to rank 0: */</span></span><br><span class="line">        MPI_Send(buff, BUFSIZE, MPI_CHAR, <span class="number">0</span>, TAG, MPI_COMM_WORLD);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* MPI programs end with MPI Finalize; this is a weak synchronization point */</span></span><br><span class="line">    MPI_Finalize();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>PS：这段代码中，由于VS高版本安全性能的提升，不能使用<code>sprintf</code>、<code>strncat</code>函数，因此，代码中全部被改为了<code>sprintf_s</code>与<code>strncat_s</code>。低版本的VS抱错的话，请自动改回来。</p>
+<h2 id="5-修改调试方式"><a href="#5-修改调试方式" class="headerlink" title="5. 修改调试方式"></a>5. 修改调试方式</h2><p>由于MPI程序要能并行计算，必须由<code>mpiexec.exe</code>启动，不能直接运行程序的exe，因此需要修改程序的运行方式。“项目右键→属性→配置属性→调试”，将<code>命令</code>改为<code>mpiexec</code>，<code>工作参数</code>改为<code>$(TargetPath)</code>。<br><img src="/images/VS_MPI_LINK.png" alt="Demo"></p>
+<h2 id="6-生成"><a href="#6-生成" class="headerlink" title="6. 生成"></a>6. 生成</h2><p>不报错即可。生成后结果如下：<br><img src="/images/VS_MPI_RESULT.png" alt="Demo"></p>
+<h1 id="使用Qt编写MPI程序"><a href="#使用Qt编写MPI程序" class="headerlink" title="使用Qt编写MPI程序"></a>使用Qt编写MPI程序</h1><p>其实严格来说，这讲的是用QtCreator来构建，实际上编译器还是VC的。</p>
+<h2 id="1-新建工程-1"><a href="#1-新建工程-1" class="headerlink" title="1. 新建工程"></a>1. 新建工程</h2><p>新建项目→非Qt项目→纯c++语言项目</p>
+<h2 id="2-配置环境变量"><a href="#2-配置环境变量" class="headerlink" title="2. 配置环境变量"></a>2. 配置环境变量</h2><p>可以直接在系统环境变量中配置，也可以在Qt中的“项目→构建与运行→构建变量”中进行。具体设置如下：</p>
+<ul>
+<li>添加MPI安装路径里的Inc路径到环境变量<code>include</code>中（不存在则新建这个环境变量，下同）；</li>
+<li>添加MPI的lib文件所在路径到环境变量<code>lib</code>中。（与前文一样，注意32位与64位的区别）<h2 id="3-修改pro文件"><a href="#3-修改pro文件" class="headerlink" title="3. 修改pro文件"></a>3. 修改pro文件</h2>在项目pro文件，在里面添加下面2行代码，并重新qmake：<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">LIBS += -lmsmpi</span><br><span class="line">DESTDIR = ./</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>第一句代表链接到msmpi.lib文件。第二句是为了后面更好的运行程序，更改了我们程序生成的路径。</p>
+<h2 id="4-code-1"><a href="#4-code-1" class="headerlink" title="4. code"></a>4. code</h2><p>代码跟前文VS里的一样，只需把第一行去掉</p>
+<h2 id="5-修改调试方式-1"><a href="#5-修改调试方式-1" class="headerlink" title="5. 修改调试方式"></a>5. 修改调试方式</h2><p>“项目→构建与运行→运行”设置如下图：<br><img src="/images/QT_MPI.png" alt="Demo"><br>其中，执行的是mpiexec.exe，“MPITest.exe”为程序生成的exe。这一步的目的跟VS中的一样。</p>
+<h2 id="6-构建并运行"><a href="#6-构建并运行" class="headerlink" title="6. 构建并运行"></a>6. 构建并运行</h2><p>运行结果应该跟VS的一样</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>MPI程序在Win下面跟普通的第三方库并没有太大区别，只是在运行的时候，需要由<br>mpiexec.exe来启动程序。由本文可以看出，文中提供Win下两种IDE编译MPI程序的方法，大同小异。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><a href="http://zh.wikipedia.org/wiki/%E8%A8%8A%E6%81%AF%E5%82%B3%E9%81%9E%E4%BB%8B%E9%9D%A2" target="_blank" rel="noopener">MPI维基百科</a></li>
+<li><a href="http://www.mpich.org/" target="_blank" rel="noopener">MPICH官网</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>开发</category>
+      </categories>
+      <tags>
+        <tag>Qt</tag>
+        <tag>MSVC</tag>
+        <tag>MPI</tag>
+        <tag>并行计算</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>QGIS开发教程(1)——QGIS开发准备工作</title>
+    <url>/2015/05/09/qgis-1-preparation/</url>
+    <content><![CDATA[<center><strong>（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）</strong></center>
+
+<h1 id="获取编译好的QGIS"><a href="#获取编译好的QGIS" class="headerlink" title="获取编译好的QGIS"></a>获取编译好的QGIS</h1><p><code>QGIS</code>是跨平台的，因此在不同平台上获取编译好的<code>QGIS</code>方法也不尽相同。<br>我不推荐直接从源码编译<code>QGIS</code>（但是需要保留一份源代码以供学习），因为<code>QGIS</code>的依赖库实在是太多了，配置比较复杂。并且，QGIS更新频繁，不可能每次出来新的Release，都要再来编译一遍啊。</p>
+<a id="more"></a>
+<h2 id="1-Windows"><a href="#1-Windows" class="headerlink" title="1. Windows"></a>1. Windows</h2><p>在<code>Windows</code>系统上，可以通过<a href="http://trac.osgeo.org/osgeo4w/" target="_blank" rel="noopener"><code>OSGeo4W</code>项目</a> 来获取包括<code>QGIS</code>、<code>GDAL</code>在内的开源空间库的二进制开发包。如果电脑是64位的，推荐使用64位的<code>OSGeo4W</code>。在安装的过程中，要选中<code>&quot;Advanced Install&quot;</code>，然后要勾选<code>&quot;qgis-devel&quot;</code>。<br>安装完毕后，基于<code>VS2010</code>编译的<code>QGIS</code>就配置好了。</p>
+<h2 id="2-Linux-amp-Mac-OS"><a href="#2-Linux-amp-Mac-OS" class="headerlink" title="2. Linux &amp; Mac OS"></a>2. Linux &amp; Mac OS</h2><p>在非<code>Windows</code>平台上安装<code>QGIS</code>，只需按照<a href="http://www.qgis.org/en/site/forusers/download.html" target="_blank" rel="noopener">官方说明</a> 操作即可。</p>
+<h1 id="基础学习"><a href="#基础学习" class="headerlink" title="基础学习"></a>基础学习</h1><p><code>QGIS</code>源代码托管在<code>Github</code>上面，（<a href="https://github.com/qgis/QGIS" target="_blank" rel="noopener">我是传送门</a> ）。学习<code>QGIS</code>，少不了查阅源代码，因此我们有必要拖一份源代码到本机上来。</p>
+<p>为了弄清楚QGIS源代码结构，我们有必要掌握以下工具的基本使用方法：</p>
+<h2 id="1-Git-amp-amp-Github"><a href="#1-Git-amp-amp-Github" class="headerlink" title="1. Git &amp;&amp; Github"></a>1. Git &amp;&amp; Github</h2><p>Git是一个分布式版本控制系统，读者可以阅读<a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/001373962845513aefd77a99f4145f0a2c7a7ca057e7570000" target="_blank" rel="noopener">《Git教程》</a> 来了解。<br>Github是一个代码托管网站，用户可以通过Git将代码托管在Github上面。目前，主流的开源项目都会将源代码托管在Github上。</p>
+<h2 id="2-Qt"><a href="#2-Qt" class="headerlink" title="2. Qt"></a>2. Qt</h2><p><code>QGIS</code>是基于<code>Qt4</code>开发的（之前的博客介绍过Qt）。<code>Qt</code>目前最新版本是5.4，但是<code>QGIS</code>暂时只支持Qt4（<code>QGIS</code>最新版开始支持<code>Qt5</code>了，但需要自己编译）。</p>
+<p>在<code>Windows</code>系统下面，使用<code>OSGeo4W</code>安装<code>QGIS</code>后，应该也就自动安装好了<code>Qt4</code>。</p>
+<p><code>Qt</code>入门推荐看这个系列：<a href="http://www.devbean.net/2012/08/qt-study-road-2-catelog/" target="_blank" rel="noopener">《Qt 学习之路 2》</a></p>
+<h2 id="3-Qt-Creator（qmake）"><a href="#3-Qt-Creator（qmake）" class="headerlink" title="3. Qt Creator（qmake）"></a>3. Qt Creator（qmake）</h2><p>本系列<code>QGIS</code>教程，使用<code>Qt Creator</code>作为IDE，因为使用<code>Qt Creator</code>来开发<code>Qt</code>项目是最爽的（并且是跨平台的）。<br><code>Qt Creator</code><a href="http://www.qt.io/download-open-source" target="_blank" rel="noopener">下载地址</a><br>一般在Qt Creator中的基于Qt的程序，大都由qmake构建，项目信息写在pro文件中（Qt Creator还支持CMake构建的项目）。</p>
+<pre><code>qmake是一个协助简化跨平台进行项目开发的构建过程的工具程序，Qt附带的工具之一 。
+qmake能够自动生成Makefile、Microsoft Visual Studio 项目文件 和 xcode 项目文件。
+不管源代码是否是用Qt写的，都能使用qmake，因此qmake能用于很多软件的构建过程。
+</code></pre><p>by 维基百科——<a href="http://zh.wikipedia.org/zh-cn/Qmake" target="_blank" rel="noopener">qmake</a></p>
+<h1 id="QGIS的代码结构"><a href="#QGIS的代码结构" class="headerlink" title="QGIS的代码结构"></a>QGIS的代码结构</h1><p>进入<code>QGIS</code>源代码文件夹，可以看见，其目录结构如下：</p>
+<pre><code>QGIS
+├─.tx                        
+├─cmake                 CMake相关文件
+├─cmake_templates
+├─debian                Debian系统相关配置文件
+├─doc                   文档
+├─i18n                  国际化文件（翻译）
+├─images                图表
+├─mac                   Mac OS系统相关配置文件
+├─ms-windows            Windows系统相关配置文件
+├─postinstall
+├─python                PyQGIS
+├─resources             资源文件
+├─scripts               脚本文件
+├─src                   C++源代码文件
+├─tests                 测试
+└─tools                    
+</code></pre><p>其中，我们只关心src文件夹：</p>
+<pre><code>QGIS
+├─src
+│  ├─analysis            空间分析模块，对应qgis_analysis.dll
+│  ├─app                 主程序，对应qgis-bin.exe
+│  ├─astyle              Artistic Style
+│  ├─browser             QGIS的浏览器，对应qgis-browser-bin.exe
+│  ├─core                QGIS核心模块，对应qgis_core.dll
+│  ├─crssync        
+│  ├─customwidgets       QGIS在Qt Creator中的控件
+│  ├─designer            
+│  ├─gui                 QGIS的GUI界面模块，对应qgis_gui.dll
+│  ├─helpviewer          QGIS帮助浏览器
+│  ├─mapserver
+│  ├─plugins             QGIS插件
+│  ├─providers           QGIS数据Provider
+│  ├─python              QGIS内置Python解析器模块，对应qgispython.dll
+│  └─ui                  QGIS界面UI文件
+</code></pre><p>由其源码我们看到，<code>QGIS</code>由<code>CMake</code>管理构建，内部采用模块化开发。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>如果现在电脑上按照上述要求，有了完整的QGIS-开发包（Win下面就是lib、dll和一堆头文件）和Qt4、QtCreator，那么就可以开始进行基于QGIS的开发了！</p>
+]]></content>
+      <categories>
+        <category>QGIS开发教程</category>
+      </categories>
+      <tags>
+        <tag>Qt</tag>
+        <tag>QGIS</tag>
+        <tag>C++</tag>
+        <tag>Git</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Qt云服务/云计算平台QTC（Qt Cloud Services）入门（0）—— Introduction</title>
     <url>/2014/09/26/2014-09-26-QTC-Introduction/</url>
     <content><![CDATA[<center><strong>（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）</strong></center>
@@ -68,47 +190,67 @@
       </tags>
   </entry>
   <entry>
-    <title>Windows下用VC与QT编译MPI程序入门</title>
-    <url>/2014/04/29/2014-04-29-win-mpi/</url>
+    <title>QGIS开发教程(2)——第一个QGIS项目</title>
+    <url>/2015/05/10/qgis-2-first/</url>
     <content><![CDATA[<center><strong>（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）</strong></center>
 
-
-<p><a href="http://zh.wikipedia.org/wiki/%E8%A8%8A%E6%81%AF%E5%82%B3%E9%81%9E%E4%BB%8B%E9%9D%A2" target="_blank" rel="noopener">MPI</a>是<code>信息传递接口</code>的简称，常用来进行进程间、机器间的通信与并行计算。一般而言，MPI都会部署在*nix系统下，在Windows下面直接编译、配置MPI并不容易。本文利用MS提供的编译好的MPI的版本，介绍如何在Windows原生环境下（不包括MinGW、CygWin），使用VC或QT编译MPI程序。</p>
+<h1 id="新建Qt项目"><a href="#新建Qt项目" class="headerlink" title="新建Qt项目"></a>新建Qt项目</h1><p>按照如下格式，新建一个项目的pro文件（可以是<code>Qt Creator</code>创建，也可以是<code>qmake</code>来创建）：</p>
 <a id="more"></a>
-<h1 id="下载、安装MPI"><a href="#下载、安装MPI" class="headerlink" title="下载、安装MPI"></a>下载、安装MPI</h1><p>MS官网提供编译好的MPI安装程序，可以直接下载<a href="http://go.microsoft.com/fwlink/?LinkId=389563" target="_blank" rel="noopener">【传送门】</a>。下载好后，直接安装既可。</p>
-<h1 id="使用VS编写MPI程序"><a href="#使用VS编写MPI程序" class="headerlink" title="使用VS编写MPI程序"></a>使用VS编写MPI程序</h1><h2 id="1-新建工程"><a href="#1-新建工程" class="headerlink" title="1. 新建工程"></a>1. 新建工程</h2><p>新建VC控制台工程。</p>
-<h2 id="2-配置路径"><a href="#2-配置路径" class="headerlink" title="2. 配置路径"></a>2. 配置路径</h2><p>“项目右键→属性→配置属性→VC++目录”中，分别将MPI安装路径里的Inc与Lib路径添加到<code>包含目录</code>和<code>库目录</code>中。PS：上述Lib路径，32位环境下面是指Lib下面的i386文件夹，64位库则是指amd64文件夹。<br><img src="/images/VS_MPI.png" alt="Demo"></p>
-<h2 id="3-配置lib文件"><a href="#3-配置lib文件" class="headerlink" title="3. 配置lib文件"></a>3. 配置lib文件</h2><p>“项目右键→属性→配置属性→链接器→输入→附加依赖项”，添加MPI的lib文件，即msmpi.lib<br><img src="/images/VS_MPI_DEBUG.png" alt="Demo"></p>
-<h2 id="4-code"><a href="#4-code" class="headerlink" title="4. code"></a>4. code</h2><p>在cpp文件中，写入如下代码（找不到<code>stdafx.h</code>的，可以删掉第一句）：<br><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"stdafx.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;mpi.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BUFSIZE 128</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> TAG 0</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> idstr[<span class="number">32</span>];</span><br><span class="line">    <span class="keyword">char</span> buff[BUFSIZE];</span><br><span class="line">    <span class="keyword">int</span> numprocs;</span><br><span class="line">    <span class="keyword">int</span> myid;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    MPI_Status stat;</span><br><span class="line">    <span class="comment">/* MPI programs start with MPI_Init; all 'N' processes exist thereafter */</span></span><br><span class="line">    MPI_Init(&amp;argc,&amp;argv);</span><br><span class="line">    <span class="comment">/* find out how big the SPMD world is */</span></span><br><span class="line">    MPI_Comm_size(MPI_COMM_WORLD,&amp;numprocs);</span><br><span class="line">    <span class="comment">/* and this processes' rank is */</span></span><br><span class="line">    MPI_Comm_rank(MPI_COMM_WORLD,&amp;myid);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* At this point, all programs are running equivalently, the rank</span></span><br><span class="line"><span class="comment">      distinguishes the roles of the programs in the SPMD model, with</span></span><br><span class="line"><span class="comment">      rank 0 often used specially... */</span></span><br><span class="line">    <span class="keyword">if</span>(myid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%d: We have %d processors\n"</span>, myid, numprocs);</span><br><span class="line">        <span class="keyword">for</span>(i=<span class="number">1</span>;i&lt;numprocs;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            sprintf_s(buff, <span class="string">"Hello %d! "</span>, i);</span><br><span class="line">            MPI_Send(buff, BUFSIZE, MPI_CHAR, i, TAG, MPI_COMM_WORLD);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(i=<span class="number">1</span>;i&lt;numprocs;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            MPI_Recv(buff, BUFSIZE, MPI_CHAR, i, TAG, MPI_COMM_WORLD, &amp;stat);</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"%d: %s\n"</span>, myid, buff);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* receive from rank 0: */</span></span><br><span class="line">        MPI_Recv(buff, BUFSIZE, MPI_CHAR, <span class="number">0</span>, TAG, MPI_COMM_WORLD, &amp;stat);</span><br><span class="line">        sprintf_s(idstr, <span class="string">"Processor %d "</span>, myid);</span><br><span class="line">        strncat_s(buff, idstr, BUFSIZE<span class="number">-1</span>);</span><br><span class="line">        strncat_s(buff, <span class="string">"reporting for duty\n"</span>, BUFSIZE<span class="number">-1</span>);</span><br><span class="line">        <span class="comment">/* send to rank 0: */</span></span><br><span class="line">        MPI_Send(buff, BUFSIZE, MPI_CHAR, <span class="number">0</span>, TAG, MPI_COMM_WORLD);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* MPI programs end with MPI Finalize; this is a weak synchronization point */</span></span><br><span class="line">    MPI_Finalize();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>PS：这段代码中，由于VS高版本安全性能的提升，不能使用<code>sprintf</code>、<code>strncat</code>函数，因此，代码中全部被改为了<code>sprintf_s</code>与<code>strncat_s</code>。低版本的VS抱错的话，请自动改回来。</p>
-<h2 id="5-修改调试方式"><a href="#5-修改调试方式" class="headerlink" title="5. 修改调试方式"></a>5. 修改调试方式</h2><p>由于MPI程序要能并行计算，必须由<code>mpiexec.exe</code>启动，不能直接运行程序的exe，因此需要修改程序的运行方式。“项目右键→属性→配置属性→调试”，将<code>命令</code>改为<code>mpiexec</code>，<code>工作参数</code>改为<code>$(TargetPath)</code>。<br><img src="/images/VS_MPI_LINK.png" alt="Demo"></p>
-<h2 id="6-生成"><a href="#6-生成" class="headerlink" title="6. 生成"></a>6. 生成</h2><p>不报错即可。生成后结果如下：<br><img src="/images/VS_MPI_RESULT.png" alt="Demo"></p>
-<h1 id="使用Qt编写MPI程序"><a href="#使用Qt编写MPI程序" class="headerlink" title="使用Qt编写MPI程序"></a>使用Qt编写MPI程序</h1><p>其实严格来说，这讲的是用QtCreator来构建，实际上编译器还是VC的。</p>
-<h2 id="1-新建工程-1"><a href="#1-新建工程-1" class="headerlink" title="1. 新建工程"></a>1. 新建工程</h2><p>新建项目→非Qt项目→纯c++语言项目</p>
-<h2 id="2-配置环境变量"><a href="#2-配置环境变量" class="headerlink" title="2. 配置环境变量"></a>2. 配置环境变量</h2><p>可以直接在系统环境变量中配置，也可以在Qt中的“项目→构建与运行→构建变量”中进行。具体设置如下：</p>
-<ul>
-<li>添加MPI安装路径里的Inc路径到环境变量<code>include</code>中（不存在则新建这个环境变量，下同）；</li>
-<li>添加MPI的lib文件所在路径到环境变量<code>lib</code>中。（与前文一样，注意32位与64位的区别）<h2 id="3-修改pro文件"><a href="#3-修改pro文件" class="headerlink" title="3. 修改pro文件"></a>3. 修改pro文件</h2>在项目pro文件，在里面添加下面2行代码，并重新qmake：<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">LIBS += -lmsmpi</span><br><span class="line">DESTDIR = ./</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>第一句代表链接到msmpi.lib文件。第二句是为了后面更好的运行程序，更改了我们程序生成的路径。</p>
-<h2 id="4-code-1"><a href="#4-code-1" class="headerlink" title="4. code"></a>4. code</h2><p>代码跟前文VS里的一样，只需把第一行去掉</p>
-<h2 id="5-修改调试方式-1"><a href="#5-修改调试方式-1" class="headerlink" title="5. 修改调试方式"></a>5. 修改调试方式</h2><p>“项目→构建与运行→运行”设置如下图：<br><img src="/images/QT_MPI.png" alt="Demo"><br>其中，执行的是mpiexec.exe，“MPITest.exe”为程序生成的exe。这一步的目的跟VS中的一样。</p>
-<h2 id="6-构建并运行"><a href="#6-构建并运行" class="headerlink" title="6. 构建并运行"></a>6. 构建并运行</h2><p>运行结果应该跟VS的一样</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>MPI程序在Win下面跟普通的第三方库并没有太大区别，只是在运行的时候，需要由<br>mpiexec.exe来启动程序。由本文可以看出，文中提供Win下两种IDE编译MPI程序的方法，大同小异。</p>
-<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
-<li><a href="http://zh.wikipedia.org/wiki/%E8%A8%8A%E6%81%AF%E5%82%B3%E9%81%9E%E4%BB%8B%E9%9D%A2" target="_blank" rel="noopener">MPI维基百科</a></li>
-<li><a href="http://www.mpich.org/" target="_blank" rel="noopener">MPICH官网</a></li>
+<pre><code>QT       += core gui xml
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TARGET = 1_FirstApp
+TEMPLATE = app
+
+SOURCES += main.cpp\
+        mainwindow.cpp
+
+HEADERS  += mainwindow.h
+
+LIBS += -lqgis_core -lqgis_gui
+
+unix{
+DEFINES += CORE_EXPORT=
+DEFINES += GUI_EXPORT=
+}
+!unix{
+DEFINES += CORE_EXPORT=__declspec(dllimport)
+DEFINES += GUI_EXPORT=__declspec(dllimport)
+}
+</code></pre><p>需要注意的是：</p>
+<ol>
+<li>使用<code>QGIS</code>时，必须要包含<code>Qt</code>的<code>XML</code>模块</li>
+<li><code>LIBS += -lqgis_core  -lqgis_gui</code>表明，该程序要包含两个lib文件：qgis_core.lib、qgis_gui.lib(以Win中OSGeo4W为例，这俩文件在<code>C:\OSGeo4W64\apps\qgis\lib</code>)</li>
+<li>使用<code>QGIS</code>需要定义两个宏（如果用别的模块还有有其他的宏需要定义），<code>Unix</code>系统下定义<code>CORE_EXPORT</code>、<code>GUI_EXPORT</code>为空即可，<code>Win</code>下需要定义为<code>__declspec(dllimport)</code>。</li>
 </ol>
+<p>在使用<code>QGIS</code>库时，项目还需要能够找到<code>QGIS</code>项目的头文件及lib文件所在路径。因此我们需要告诉项目<code>include</code>和<code>lib</code>所在的路径。许多人直接在pro文件里面显示指定路径，然而我并不推荐这样使用，因为这会破坏项目的跨平台性。（在<code>Linux</code>系统下，默认是不需要显式指定的）</p>
+<p>我的做法是，设置两个环境变量，分别为<code>lib</code>与<code>include</code>，将所用第三方库头文件、库文件所在路径都加到变量里面去。另外，程序运行的时候还需要在Path变量里面找到dll所在路径。下面是我添加的环境变量（Windows OSGeo4W为例）：</p>
+<pre><code>lib      C:\OSGeo4W64\apps\qgis\lib;C:\OSGeo4W64\lib
+include  C:\OSGeo4W64\apps\qgis\include;C:\OSGeo4W64\include
+path     C:\OSGeo4W64\bin;C:\OSGeo4W64\apps\qgis\bin
+</code></pre><h1 id="添加代码"><a href="#添加代码" class="headerlink" title="添加代码"></a>添加代码</h1><p>在<code>main.cpp</code>里面，把<code>QApplication</code>替换为<code>QgsApplication</code>，并且其构造函数要增加第三个参数。<br><code>main.cpp</code>代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"mainwindow.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;QDir&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;qgsapplication.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">QgsApplication <span class="title">a</span><span class="params">(argc, argv, <span class="literal">true</span>)</span></span>;</span><br><span class="line">	QgsApplication::setPluginPath(QDir::currentPath()+<span class="string">"/Plugins"</span>);</span><br><span class="line">	QgsApplication::initQgis();</span><br><span class="line">	MainWindow w;</span><br><span class="line">	w.show();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> a.exec();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中，<code>QgsApplication::setPluginPath(QDir::currentPath()+&quot;/Plugins&quot;);</code>表示指定<code>QGIS</code>插件路径为程序所在目录下<code>Plugins</code>文件夹。因此在运行程序之前，需要将<code>QGIS</code>所有插件（<code>Win</code>下是dll文件）复制到这个文件夹下面来，否则程序无法读取空间数据。（<code>OSGeo4W</code>中，<code>QGIS</code>插件路径为<code>C:\OSGeo4W64\apps\qgis\plugins</code>）</p>
+<p>现在，就可以直接运行程序，弹出一个空白的对话框：<br><img src="/images/QGIS/empty_window.jpg" alt="EmptyDialog" title="空白的窗体"></p>
+<h1 id="打开Shapefile文件"><a href="#打开Shapefile文件" class="headerlink" title="打开Shapefile文件"></a>打开Shapefile文件</h1><p>现在我们来对<code>MainWindow</code>类进行操作，使其具有打开矢量文件并显示的功能。代码如下：</p>
+<p>mainwindow.h</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> MAINWINDOW_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAINWINDOW_H</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;QMainWindow&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">QgsMapCanvas</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MainWindow</span> :</span> <span class="keyword">public</span> QMainWindow</span><br><span class="line">&#123;</span><br><span class="line">	Q_OBJECT</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	MainWindow(QWidget *parent = <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> slots:</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">open</span><span class="params">()</span></span>;<span class="comment">//Open file</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	QgsMapCanvas *canvas;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">// MAINWINDOW_H</span></span></span><br></pre></td></tr></table></figure>
+<p>mainwindow.cpp</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"mainwindow.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;QtCore&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;QMenuBar&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;QFileDialog&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;QMessageBox&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;qgsmaplayerregistry.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;qgsmapcanvas.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;qgsvectorlayer.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">MainWindow::MainWindow(QWidget *parent)</span><br><span class="line">	: QMainWindow(parent),canvas(<span class="keyword">new</span> QgsMapCanvas(<span class="keyword">this</span>))</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">this</span>-&gt;resize(<span class="number">800</span>,<span class="number">600</span>);</span><br><span class="line"></span><br><span class="line">	QMenuBar *menuBar = <span class="keyword">new</span> QMenuBar(<span class="keyword">this</span>);</span><br><span class="line">	menuBar-&gt;addAction(tr(<span class="string">"Open File"</span>),<span class="keyword">this</span>,SLOT(open()));</span><br><span class="line">	<span class="keyword">this</span>-&gt;setMenuBar(menuBar);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">this</span>-&gt;setCentralWidget(canvas);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> MainWindow::open()</span><br><span class="line">&#123;</span><br><span class="line">	QString path = QFileDialog::getOpenFileName(<span class="keyword">this</span>,tr(<span class="string">"Open File"</span>),QString(),<span class="string">"ESRI Shapefile(*.shp)"</span>);</span><br><span class="line">	<span class="keyword">if</span> (path.isEmpty())  <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">	QgsVectorLayer *layer = <span class="keyword">new</span> QgsVectorLayer(path,QFileInfo(path).completeBaseName(),<span class="string">"ogr"</span>);</span><br><span class="line">	<span class="keyword">if</span> (!layer-&gt;isValid())</span><br><span class="line">	&#123;</span><br><span class="line">		QMessageBox::critical(<span class="keyword">this</span>,tr(<span class="string">"Error"</span>),tr(<span class="string">"Open file failed!\nReason:%1"</span>).arg(layer-&gt;lastError()));</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	QgsMapLayerRegistry::instance()-&gt;addMapLayer(layer);</span><br><span class="line">	canvas-&gt;setLayerSet(QList&lt;QgsMapCanvasLayer&gt;()&lt;&lt;QgsMapCanvasLayer(layer));</span><br><span class="line">	canvas-&gt;zoomToFullExtent();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>QGIS</code>程序中，显示、渲染空间数据的Widget类是<code>QgsMapCanvas</code>类，该类的<code>setLayerSet()</code>函数用来控制canvas中待显示的图层。<code>QgsVectorLayer</code>的一个对象，就代表一个矢量图层。<br>需要注意的是，往画布里面添加新的图层时，要在<code>QgsMapLayerRegistry::instance()</code>对象中进行注册。</p>
+<p>程序运行，并打开一个<code>Shapefile</code>文件的效果图如下（一定要记得将<code>QGIS</code>的<code>Plugins</code>目录复制到程序所在路径）：</p>
+<p><img src="/images/QGIS/first_app.jpg" alt="FirstImage" title="效果图"></p>
+<p>PS：使用OSGeo4W时，由于只提供了Release版的QGIS，因此也只能编译Release版的程序。如果程序需要调试，可以考虑采用log的方式。</p>
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><p>本教程所有例子的代码，托管在Github上，地址：<a href="https://github.com/chenguanzhou/QGIS-Cpp-API-Tutorial" target="_blank" rel="noopener">https://github.com/chenguanzhou/QGIS-Cpp-API-Tutorial</a></p>
 ]]></content>
       <categories>
-        <category>开发</category>
+        <category>QGIS开发教程</category>
       </categories>
       <tags>
         <tag>Qt</tag>
-        <tag>MSVC</tag>
-        <tag>MPI</tag>
-        <tag>并行计算</tag>
+        <tag>QGIS</tag>
+        <tag>C++</tag>
+        <tag>Shapefile</tag>
       </tags>
   </entry>
   <entry>
@@ -203,75 +345,6 @@
         <tag>SQLite</tag>
         <tag>MVC</tag>
         <tag>数据库</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>QGIS开发教程(1)——QGIS开发准备工作</title>
-    <url>/2015/05/09/qgis-1-preparation/</url>
-    <content><![CDATA[<center><strong>（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）</strong></center>
-
-<h1 id="获取编译好的QGIS"><a href="#获取编译好的QGIS" class="headerlink" title="获取编译好的QGIS"></a>获取编译好的QGIS</h1><p><code>QGIS</code>是跨平台的，因此在不同平台上获取编译好的<code>QGIS</code>方法也不尽相同。<br>我不推荐直接从源码编译<code>QGIS</code>（但是需要保留一份源代码以供学习），因为<code>QGIS</code>的依赖库实在是太多了，配置比较复杂。并且，QGIS更新频繁，不可能每次出来新的Release，都要再来编译一遍啊。</p>
-<a id="more"></a>
-<h2 id="1-Windows"><a href="#1-Windows" class="headerlink" title="1. Windows"></a>1. Windows</h2><p>在<code>Windows</code>系统上，可以通过<a href="http://trac.osgeo.org/osgeo4w/" target="_blank" rel="noopener"><code>OSGeo4W</code>项目</a> 来获取包括<code>QGIS</code>、<code>GDAL</code>在内的开源空间库的二进制开发包。如果电脑是64位的，推荐使用64位的<code>OSGeo4W</code>。在安装的过程中，要选中<code>&quot;Advanced Install&quot;</code>，然后要勾选<code>&quot;qgis-devel&quot;</code>。<br>安装完毕后，基于<code>VS2010</code>编译的<code>QGIS</code>就配置好了。</p>
-<h2 id="2-Linux-amp-Mac-OS"><a href="#2-Linux-amp-Mac-OS" class="headerlink" title="2. Linux &amp; Mac OS"></a>2. Linux &amp; Mac OS</h2><p>在非<code>Windows</code>平台上安装<code>QGIS</code>，只需按照<a href="http://www.qgis.org/en/site/forusers/download.html" target="_blank" rel="noopener">官方说明</a> 操作即可。</p>
-<h1 id="基础学习"><a href="#基础学习" class="headerlink" title="基础学习"></a>基础学习</h1><p><code>QGIS</code>源代码托管在<code>Github</code>上面，（<a href="https://github.com/qgis/QGIS" target="_blank" rel="noopener">我是传送门</a> ）。学习<code>QGIS</code>，少不了查阅源代码，因此我们有必要拖一份源代码到本机上来。</p>
-<p>为了弄清楚QGIS源代码结构，我们有必要掌握以下工具的基本使用方法：</p>
-<h2 id="1-Git-amp-amp-Github"><a href="#1-Git-amp-amp-Github" class="headerlink" title="1. Git &amp;&amp; Github"></a>1. Git &amp;&amp; Github</h2><p>Git是一个分布式版本控制系统，读者可以阅读<a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/001373962845513aefd77a99f4145f0a2c7a7ca057e7570000" target="_blank" rel="noopener">《Git教程》</a> 来了解。<br>Github是一个代码托管网站，用户可以通过Git将代码托管在Github上面。目前，主流的开源项目都会将源代码托管在Github上。</p>
-<h2 id="2-Qt"><a href="#2-Qt" class="headerlink" title="2. Qt"></a>2. Qt</h2><p><code>QGIS</code>是基于<code>Qt4</code>开发的（之前的博客介绍过Qt）。<code>Qt</code>目前最新版本是5.4，但是<code>QGIS</code>暂时只支持Qt4（<code>QGIS</code>最新版开始支持<code>Qt5</code>了，但需要自己编译）。</p>
-<p>在<code>Windows</code>系统下面，使用<code>OSGeo4W</code>安装<code>QGIS</code>后，应该也就自动安装好了<code>Qt4</code>。</p>
-<p><code>Qt</code>入门推荐看这个系列：<a href="http://www.devbean.net/2012/08/qt-study-road-2-catelog/" target="_blank" rel="noopener">《Qt 学习之路 2》</a></p>
-<h2 id="3-Qt-Creator（qmake）"><a href="#3-Qt-Creator（qmake）" class="headerlink" title="3. Qt Creator（qmake）"></a>3. Qt Creator（qmake）</h2><p>本系列<code>QGIS</code>教程，使用<code>Qt Creator</code>作为IDE，因为使用<code>Qt Creator</code>来开发<code>Qt</code>项目是最爽的（并且是跨平台的）。<br><code>Qt Creator</code><a href="http://www.qt.io/download-open-source" target="_blank" rel="noopener">下载地址</a><br>一般在Qt Creator中的基于Qt的程序，大都由qmake构建，项目信息写在pro文件中（Qt Creator还支持CMake构建的项目）。</p>
-<pre><code>qmake是一个协助简化跨平台进行项目开发的构建过程的工具程序，Qt附带的工具之一 。
-qmake能够自动生成Makefile、Microsoft Visual Studio 项目文件 和 xcode 项目文件。
-不管源代码是否是用Qt写的，都能使用qmake，因此qmake能用于很多软件的构建过程。
-</code></pre><p>by 维基百科——<a href="http://zh.wikipedia.org/zh-cn/Qmake" target="_blank" rel="noopener">qmake</a></p>
-<h1 id="QGIS的代码结构"><a href="#QGIS的代码结构" class="headerlink" title="QGIS的代码结构"></a>QGIS的代码结构</h1><p>进入<code>QGIS</code>源代码文件夹，可以看见，其目录结构如下：</p>
-<pre><code>QGIS
-├─.tx                        
-├─cmake                 CMake相关文件
-├─cmake_templates
-├─debian                Debian系统相关配置文件
-├─doc                   文档
-├─i18n                  国际化文件（翻译）
-├─images                图表
-├─mac                   Mac OS系统相关配置文件
-├─ms-windows            Windows系统相关配置文件
-├─postinstall
-├─python                PyQGIS
-├─resources             资源文件
-├─scripts               脚本文件
-├─src                   C++源代码文件
-├─tests                 测试
-└─tools                    
-</code></pre><p>其中，我们只关心src文件夹：</p>
-<pre><code>QGIS
-├─src
-│  ├─analysis            空间分析模块，对应qgis_analysis.dll
-│  ├─app                 主程序，对应qgis-bin.exe
-│  ├─astyle              Artistic Style
-│  ├─browser             QGIS的浏览器，对应qgis-browser-bin.exe
-│  ├─core                QGIS核心模块，对应qgis_core.dll
-│  ├─crssync        
-│  ├─customwidgets       QGIS在Qt Creator中的控件
-│  ├─designer            
-│  ├─gui                 QGIS的GUI界面模块，对应qgis_gui.dll
-│  ├─helpviewer          QGIS帮助浏览器
-│  ├─mapserver
-│  ├─plugins             QGIS插件
-│  ├─providers           QGIS数据Provider
-│  ├─python              QGIS内置Python解析器模块，对应qgispython.dll
-│  └─ui                  QGIS界面UI文件
-</code></pre><p>由其源码我们看到，<code>QGIS</code>由<code>CMake</code>管理构建，内部采用模块化开发。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>如果现在电脑上按照上述要求，有了完整的QGIS-开发包（Win下面就是lib、dll和一堆头文件）和Qt4、QtCreator，那么就可以开始进行基于QGIS的开发了！</p>
-]]></content>
-      <categories>
-        <category>QGIS开发教程</category>
-      </categories>
-      <tags>
-        <tag>Qt</tag>
-        <tag>QGIS</tag>
-        <tag>C++</tag>
-        <tag>Git</tag>
       </tags>
   </entry>
   <entry>
@@ -372,79 +445,6 @@ qmake能够自动生成Makefile、Microsoft Visual Studio 项目文件 和 xcode
         <tag>C++</tag>
         <tag>Python</tag>
         <tag>3S</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Windows平台下各种Markdown编辑器功能对比</title>
-    <url>/2016/02/16/markdowneditor/</url>
-    <content><![CDATA[<p>不多说，上图：</p>
-<a id="more"></a>
-<p><img src="/images/markdown.png" alt="对比" title="Win平台下Markdown编辑器功能对比"></p>
-<p><a href="/images/markdown.png">大图</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>QGIS开发教程(2)——第一个QGIS项目</title>
-    <url>/2015/05/10/qgis-2-first/</url>
-    <content><![CDATA[<center><strong>（本文为本人原创，请尊重个人劳动成果。未经本人许可，严禁转载！）</strong></center>
-
-<h1 id="新建Qt项目"><a href="#新建Qt项目" class="headerlink" title="新建Qt项目"></a>新建Qt项目</h1><p>按照如下格式，新建一个项目的pro文件（可以是<code>Qt Creator</code>创建，也可以是<code>qmake</code>来创建）：</p>
-<a id="more"></a>
-<pre><code>QT       += core gui xml
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-TARGET = 1_FirstApp
-TEMPLATE = app
-
-SOURCES += main.cpp\
-        mainwindow.cpp
-
-HEADERS  += mainwindow.h
-
-LIBS += -lqgis_core -lqgis_gui
-
-unix{
-DEFINES += CORE_EXPORT=
-DEFINES += GUI_EXPORT=
-}
-!unix{
-DEFINES += CORE_EXPORT=__declspec(dllimport)
-DEFINES += GUI_EXPORT=__declspec(dllimport)
-}
-</code></pre><p>需要注意的是：</p>
-<ol>
-<li>使用<code>QGIS</code>时，必须要包含<code>Qt</code>的<code>XML</code>模块</li>
-<li><code>LIBS += -lqgis_core  -lqgis_gui</code>表明，该程序要包含两个lib文件：qgis_core.lib、qgis_gui.lib(以Win中OSGeo4W为例，这俩文件在<code>C:\OSGeo4W64\apps\qgis\lib</code>)</li>
-<li>使用<code>QGIS</code>需要定义两个宏（如果用别的模块还有有其他的宏需要定义），<code>Unix</code>系统下定义<code>CORE_EXPORT</code>、<code>GUI_EXPORT</code>为空即可，<code>Win</code>下需要定义为<code>__declspec(dllimport)</code>。</li>
-</ol>
-<p>在使用<code>QGIS</code>库时，项目还需要能够找到<code>QGIS</code>项目的头文件及lib文件所在路径。因此我们需要告诉项目<code>include</code>和<code>lib</code>所在的路径。许多人直接在pro文件里面显示指定路径，然而我并不推荐这样使用，因为这会破坏项目的跨平台性。（在<code>Linux</code>系统下，默认是不需要显式指定的）</p>
-<p>我的做法是，设置两个环境变量，分别为<code>lib</code>与<code>include</code>，将所用第三方库头文件、库文件所在路径都加到变量里面去。另外，程序运行的时候还需要在Path变量里面找到dll所在路径。下面是我添加的环境变量（Windows OSGeo4W为例）：</p>
-<pre><code>lib      C:\OSGeo4W64\apps\qgis\lib;C:\OSGeo4W64\lib
-include  C:\OSGeo4W64\apps\qgis\include;C:\OSGeo4W64\include
-path     C:\OSGeo4W64\bin;C:\OSGeo4W64\apps\qgis\bin
-</code></pre><h1 id="添加代码"><a href="#添加代码" class="headerlink" title="添加代码"></a>添加代码</h1><p>在<code>main.cpp</code>里面，把<code>QApplication</code>替换为<code>QgsApplication</code>，并且其构造函数要增加第三个参数。<br><code>main.cpp</code>代码如下：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"mainwindow.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;QDir&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;qgsapplication.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">QgsApplication <span class="title">a</span><span class="params">(argc, argv, <span class="literal">true</span>)</span></span>;</span><br><span class="line">	QgsApplication::setPluginPath(QDir::currentPath()+<span class="string">"/Plugins"</span>);</span><br><span class="line">	QgsApplication::initQgis();</span><br><span class="line">	MainWindow w;</span><br><span class="line">	w.show();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> a.exec();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>其中，<code>QgsApplication::setPluginPath(QDir::currentPath()+&quot;/Plugins&quot;);</code>表示指定<code>QGIS</code>插件路径为程序所在目录下<code>Plugins</code>文件夹。因此在运行程序之前，需要将<code>QGIS</code>所有插件（<code>Win</code>下是dll文件）复制到这个文件夹下面来，否则程序无法读取空间数据。（<code>OSGeo4W</code>中，<code>QGIS</code>插件路径为<code>C:\OSGeo4W64\apps\qgis\plugins</code>）</p>
-<p>现在，就可以直接运行程序，弹出一个空白的对话框：<br><img src="/images/QGIS/empty_window.jpg" alt="EmptyDialog" title="空白的窗体"></p>
-<h1 id="打开Shapefile文件"><a href="#打开Shapefile文件" class="headerlink" title="打开Shapefile文件"></a>打开Shapefile文件</h1><p>现在我们来对<code>MainWindow</code>类进行操作，使其具有打开矢量文件并显示的功能。代码如下：</p>
-<p>mainwindow.h</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> MAINWINDOW_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAINWINDOW_H</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;QMainWindow&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">QgsMapCanvas</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MainWindow</span> :</span> <span class="keyword">public</span> QMainWindow</span><br><span class="line">&#123;</span><br><span class="line">	Q_OBJECT</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	MainWindow(QWidget *parent = <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> slots:</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">open</span><span class="params">()</span></span>;<span class="comment">//Open file</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	QgsMapCanvas *canvas;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">// MAINWINDOW_H</span></span></span><br></pre></td></tr></table></figure>
-<p>mainwindow.cpp</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"mainwindow.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;QtCore&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;QMenuBar&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;QFileDialog&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;QMessageBox&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;qgsmaplayerregistry.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;qgsmapcanvas.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;qgsvectorlayer.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">MainWindow::MainWindow(QWidget *parent)</span><br><span class="line">	: QMainWindow(parent),canvas(<span class="keyword">new</span> QgsMapCanvas(<span class="keyword">this</span>))</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">this</span>-&gt;resize(<span class="number">800</span>,<span class="number">600</span>);</span><br><span class="line"></span><br><span class="line">	QMenuBar *menuBar = <span class="keyword">new</span> QMenuBar(<span class="keyword">this</span>);</span><br><span class="line">	menuBar-&gt;addAction(tr(<span class="string">"Open File"</span>),<span class="keyword">this</span>,SLOT(open()));</span><br><span class="line">	<span class="keyword">this</span>-&gt;setMenuBar(menuBar);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">this</span>-&gt;setCentralWidget(canvas);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> MainWindow::open()</span><br><span class="line">&#123;</span><br><span class="line">	QString path = QFileDialog::getOpenFileName(<span class="keyword">this</span>,tr(<span class="string">"Open File"</span>),QString(),<span class="string">"ESRI Shapefile(*.shp)"</span>);</span><br><span class="line">	<span class="keyword">if</span> (path.isEmpty())  <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">	QgsVectorLayer *layer = <span class="keyword">new</span> QgsVectorLayer(path,QFileInfo(path).completeBaseName(),<span class="string">"ogr"</span>);</span><br><span class="line">	<span class="keyword">if</span> (!layer-&gt;isValid())</span><br><span class="line">	&#123;</span><br><span class="line">		QMessageBox::critical(<span class="keyword">this</span>,tr(<span class="string">"Error"</span>),tr(<span class="string">"Open file failed!\nReason:%1"</span>).arg(layer-&gt;lastError()));</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	QgsMapLayerRegistry::instance()-&gt;addMapLayer(layer);</span><br><span class="line">	canvas-&gt;setLayerSet(QList&lt;QgsMapCanvasLayer&gt;()&lt;&lt;QgsMapCanvasLayer(layer));</span><br><span class="line">	canvas-&gt;zoomToFullExtent();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>QGIS</code>程序中，显示、渲染空间数据的Widget类是<code>QgsMapCanvas</code>类，该类的<code>setLayerSet()</code>函数用来控制canvas中待显示的图层。<code>QgsVectorLayer</code>的一个对象，就代表一个矢量图层。<br>需要注意的是，往画布里面添加新的图层时，要在<code>QgsMapLayerRegistry::instance()</code>对象中进行注册。</p>
-<p>程序运行，并打开一个<code>Shapefile</code>文件的效果图如下（一定要记得将<code>QGIS</code>的<code>Plugins</code>目录复制到程序所在路径）：</p>
-<p><img src="/images/QGIS/first_app.jpg" alt="FirstImage" title="效果图"></p>
-<p>PS：使用OSGeo4W时，由于只提供了Release版的QGIS，因此也只能编译Release版的程序。如果程序需要调试，可以考虑采用log的方式。</p>
-<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><p>本教程所有例子的代码，托管在Github上，地址：<a href="https://github.com/chenguanzhou/QGIS-Cpp-API-Tutorial" target="_blank" rel="noopener">https://github.com/chenguanzhou/QGIS-Cpp-API-Tutorial</a></p>
-]]></content>
-      <categories>
-        <category>QGIS开发教程</category>
-      </categories>
-      <tags>
-        <tag>Qt</tag>
-        <tag>QGIS</tag>
-        <tag>C++</tag>
-        <tag>Shapefile</tag>
       </tags>
   </entry>
 </search>
